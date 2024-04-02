@@ -1,1 +1,1 @@
-# nai-mpp-1-perceptron
+# nai-mpp-2-perceptron
