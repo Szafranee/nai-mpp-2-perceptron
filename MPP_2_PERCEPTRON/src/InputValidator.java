@@ -36,7 +36,7 @@ public class InputValidator {
         }
     }
 
-    private static double getValidLearningRate(Scanner scanner) {
+    protected static double getValidLearningRate(Scanner scanner) {
         double learningRate = 0;
         boolean isChoiceCorrect = false;
         while (!isChoiceCorrect) {

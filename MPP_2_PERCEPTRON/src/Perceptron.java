@@ -1,3 +1,5 @@
+import java.util.List;
+
 public class Perceptron {
     private double[] weights;
     private double learningRate;
@@ -10,7 +12,6 @@ public class Perceptron {
         }
         learningRate = a;
         threshold = Math.random() * 10 - 5;
-        System.out.println(threshold);
     }
 
     public int guess(double[] inputs) {
@@ -21,8 +22,11 @@ public class Perceptron {
         return sum > threshold ? 1 : 0;
     }
 
-    public void train(double[] inputs, int target) {
+    public void train(Vector vector) {
+        double[] inputs = vector.vectorValues.stream().mapToDouble(Double::doubleValue).toArray();
         int guess = guess(inputs);
+        // Target is 0 if guess is 1, and 1 if guess is 0
+        int target = guess == 1 ? 0 : 1;
         double error = target - guess;
         for (int i = 0; i < weights.length; i++) {
             weights[i] += error * inputs[i] * learningRate;
