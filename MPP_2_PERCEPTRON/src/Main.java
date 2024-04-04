@@ -86,7 +86,7 @@ public class Main {
         // Printing the results
         printResults(classSummary);
 
-        System.out.println("Do want to do leaning again? (y/n) ");
+        System.out.println("Do you want to do learning again? (y/n) ");
         boolean continueChoice = InputValidator.getYesOrNo(scanner);
         if (continueChoice) {
             handleTestDataFromFile(scanner, trainSetVectors, testSetVectors, learningRate);
