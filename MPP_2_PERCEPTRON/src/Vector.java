@@ -1,14 +1,15 @@
 import java.util.ArrayList;
+import java.util.List;
 
 public class Vector {
-    ArrayList<Double> vectorValues;
+    List<Double> vectorValues;
     String vectorName;
 
-    public Vector(ArrayList<Double> vectorValues) {
+    public Vector(List<Double> vectorValues) {
         this(vectorValues, null);
     }
 
-    public Vector(ArrayList<Double> vectorValues, String vectorName) {
+    public Vector(List<Double> vectorValues, String vectorName) {
         this.vectorValues = vectorValues;
         this.vectorName = vectorName;
     }
