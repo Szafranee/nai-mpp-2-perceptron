@@ -16,20 +16,14 @@ public class Main {
 
         List<Vector> trainSetVectors;
         List<Vector> testSetVectors = null;
-        double learningRate;
 
         System.out.println("\nFirst, we need to create and train a perceptron! 🦫\n");
+
         System.out.println("Enter the train set file name: ");
         trainSetVectors = FileHandler.getVectorsListFromFile(scanner);
 
-        System.out.println("Enter the learning rate: ");
-        learningRate = InputValidator.getValidLearningRate(scanner);
-
-        // Initializing and training the perceptron
-        int weightsLength = trainSetVectors.getFirst().vectorValues.size();
-        Perceptron perceptron = new Perceptron(weightsLength, learningRate);
-
-        perceptron.trainOnTrainSet(trainSetVectors, irisMap);
+        //Initializing and training the perceptron
+        Perceptron perceptron = createPerceptron(scanner, trainSetVectors);
 
         do {
             System.out.println("\n-------------------Menu--------------------");
@@ -74,6 +68,17 @@ public class Main {
 
         } while (continueChoice);
 
+    }
+
+    private static Perceptron createPerceptron(Scanner scanner, List<Vector> trainSetVectors) {
+        System.out.println("Enter the learning rate: ");
+        double learningRate = InputValidator.getValidLearningRate(scanner);
+
+        int weightsLength = trainSetVectors.getFirst().vectorValues.size();
+        Perceptron perceptron = new Perceptron(weightsLength, learningRate);
+
+        perceptron.trainOnTrainSet(trainSetVectors, irisMap);
+        return perceptron;
     }
 
     private static void handleTestDataFromFile(Scanner scanner, List<Vector> testSetVectors, Perceptron perceptron) {
