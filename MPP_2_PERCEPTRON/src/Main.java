@@ -4,6 +4,10 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
+    private static final Map<String, Integer> irisMap = Map.of(
+            "Iris-versicolor", 0,
+            "Iris-setosa", 1
+    );
 
     public static void ui() {
         System.out.println("================================");
@@ -51,35 +55,53 @@ public class Main {
     }
 
     private static void handleLoadTestDataFromFile(Scanner scanner) {
-        Map<String, Integer> map = Map.of("Iris-setosa", 0, "Iris-virginica", 1);
-        List<List<Vector>> vectors = loadTestDataFromFile(scanner);
-        List<Vector> trainSetVectors = vectors.get(0);
-        List<Vector> testSetVectors = vectors.get(1);
+        // train set file selection
+        System.out.println("\nYou selected to load test data from file");
+        System.out.println("Enter the train set file name: ");
+        List<Vector> trainSetVectors = FileHandler.getVectorsListFromFile(scanner);
 
         System.out.println("Enter the learning rate: ");
         double learningRate = InputValidator.getValidLearningRate(scanner);
 
-        // Training the perceptron
-        Perceptron perceptron = new Perceptron(trainSetVectors.getFirst().vectorValues.size(), learningRate);
+        // Initializing and raining the perceptron
+        int weightsLength = trainSetVectors.getFirst().vectorValues.size();
+        Perceptron perceptron = new Perceptron(weightsLength, learningRate);
+        System.out.println(perceptron);
+
         for (Vector vector : trainSetVectors) {
-            perceptron.train(vector);
+            int target = irisMap.get(vector.vectorName);
+            int guess = perceptron.guess(vector);
+            if (guess != target) {
+                perceptron.train(vector, guess);
+            }
+            System.out.println("Guess: " + guess + ", Target: " + target);
         }
+
+        // test set file selection
+        System.out.println("Enter the test set file name: ");
+        List<Vector> testSetVectors = FileHandler.getVectorsListFromFile(scanner);
 
         // Testing the perceptron
         int correct = 0;
+        int counter = 0;
         for (Vector vector : testSetVectors) {
-            double[] inputs = vector.vectorValues.stream().mapToDouble(Double::doubleValue).toArray();
-            int guess = perceptron.guess(inputs);
+            int guess = perceptron.guess(vector);
             System.out.println("Guess: " + guess + ", Target: " + vector.vectorName);
-            if (map.get(vector.vectorName) == guess) {
+            if (irisMap.get(vector.vectorName) == guess) {
+                System.out.println("Guessed correctly! EZ 😎");
                 correct++;
+            } else {
+                System.out.println("Guessed incorrectly! Sadge 😔");
             }
+            counter++;
+            System.out.println(perceptron);
+            System.out.println();
         }
 
         System.out.println("Accuracy: " + (double) correct / testSetVectors.size() * 100 + "%");
     }
 
-    private static List<List<Vector>> loadTestDataFromFile(Scanner scanner) {
+    /*private static List<List<Vector>>loadTestDataFromFile(Scanner scanner) {
         System.out.println("\nYou selected to load test data from file");
         System.out.println("Enter the train set file name: ");
         String trainSetFileName = scanner.next();
@@ -95,7 +117,7 @@ public class Main {
 
         //System.out.println(List.of(trainSetVectors, testSetVectors));
         return List.of(trainSetVectors, testSetVectors);
-    }
+    }*/
 
     private static void enterTestDataFromConsole(Scanner scanner) {
         System.out.println("\nYou selected to enter test data from console");

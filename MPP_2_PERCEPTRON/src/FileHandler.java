@@ -42,4 +42,10 @@ public class FileHandler {
         }
         return vectors;
     }
+
+    public static List<Vector> getVectorsListFromFile(Scanner scanner) {
+        String fileName = scanner.next();
+        File file = validateFile(fileName);
+        return readVectorsFromFile(file);
+    }
 }
