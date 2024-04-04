@@ -36,7 +36,7 @@ public class Main {
             }
 
             switch (choice) {
-                case 1 -> handleLoadTestDataFromFile(scanner);
+                case 1 -> handleTestDataFromFile(scanner);
                 case 2 -> enterTestDataFromConsole(scanner);
                 case 3 -> {
                     System.out.println("Goodbye!");
@@ -54,7 +54,7 @@ public class Main {
 
     }
 
-    private static void handleLoadTestDataFromFile(Scanner scanner) {
+    private static void handleTestDataFromFile(Scanner scanner) {
         // train set file selection
         System.out.println("\nYou selected to load test data from file");
         System.out.println("Enter the train set file name: ");
@@ -63,61 +63,39 @@ public class Main {
         System.out.println("Enter the learning rate: ");
         double learningRate = InputValidator.getValidLearningRate(scanner);
 
-        // Initializing and raining the perceptron
+        // Initializing and training the perceptron
         int weightsLength = trainSetVectors.getFirst().vectorValues.size();
         Perceptron perceptron = new Perceptron(weightsLength, learningRate);
-        System.out.println(perceptron);
-
-        for (Vector vector : trainSetVectors) {
-            int target = irisMap.get(vector.vectorName);
-            int guess = perceptron.guess(vector);
-            if (guess != target) {
-                perceptron.train(vector, guess);
-            }
-            System.out.println("Guess: " + guess + ", Target: " + target);
-        }
+//        System.out.println(perceptron);
+        perceptron.trainOnTrainSet(trainSetVectors, irisMap);
 
         // test set file selection
         System.out.println("Enter the test set file name: ");
         List<Vector> testSetVectors = FileHandler.getVectorsListFromFile(scanner);
 
         // Testing the perceptron
-        int correct = 0;
-        int counter = 0;
-        for (Vector vector : testSetVectors) {
-            int guess = perceptron.guess(vector);
-            System.out.println("Guess: " + guess + ", Target: " + vector.vectorName);
-            if (irisMap.get(vector.vectorName) == guess) {
-                System.out.println("Guessed correctly! EZ 😎");
-                correct++;
-            } else {
-                System.out.println("Guessed incorrectly! Sadge 😔");
-            }
-            counter++;
-            System.out.println(perceptron);
-            System.out.println();
-        }
+        Map<Integer, Map.Entry<Integer, Integer>> classSummary = perceptron.testOnTestSetAndGetAmountOfCorrectGuesses(testSetVectors, irisMap);
 
-        System.out.println("Accuracy: " + (double) correct / testSetVectors.size() * 100 + "%");
+        // Printing the results
+        printResults(classSummary);
     }
 
-    /*private static List<List<Vector>>loadTestDataFromFile(Scanner scanner) {
-        System.out.println("\nYou selected to load test data from file");
-        System.out.println("Enter the train set file name: ");
-        String trainSetFileName = scanner.next();
-        File trainSetFile = FileHandler.validateFile(trainSetFileName);
-        List<Vector> trainSetVectors = FileHandler.readVectorsFromFile(trainSetFile);
-        //System.out.println("Train set vectors: " + trainSetVectors);
+    private static void printResults(Map<Integer, Map.Entry<Integer, Integer>> classSummary) {
+        double classZeroAccuracy = (double) classSummary.get(0).getValue() / classSummary.get(0).getKey() * 100;
+        String classZeroName = getClassFromMap(irisMap, 0);
 
-        System.out.println("Enter the test set file name: ");
-        String testSetFileName = scanner.next();
-        File testSetFile = FileHandler.validateFile(testSetFileName);
-        List<Vector> testSetVectors = FileHandler.readVectorsFromFile(testSetFile);
-        //System.out.println("Test set vectors: " + testSetVectors);
+        double classOneAccuracy = (double) classSummary.get(1).getValue() / classSummary.get(1).getKey() * 100;
+        String classOneName = getClassFromMap(irisMap, 1);
 
-        //System.out.println(List.of(trainSetVectors, testSetVectors));
-        return List.of(trainSetVectors, testSetVectors);
-    }*/
+        double totalAccuracy = (double) classSummary.get(2).getValue() / classSummary.get(2).getKey() * 100;
+
+        System.out.println("Summary: ");
+        System.out.printf("%s: %s out of %s correct guesses, accuracy: %.2f%%%n", classZeroName, classSummary.get(0).getValue(), classSummary.get(0).getKey(), classZeroAccuracy);
+        System.out.printf("%s: %s out of %s correct guesses, accuracy: %.2f%%%n", classOneName, classSummary.get(1).getValue(), classSummary.get(1).getKey(), classOneAccuracy);
+        System.out.printf("Total: %s out of %s correct guesses, accuracy: %.2f%%%n", classSummary.get(2).getValue(), classSummary.get(2).getKey(), totalAccuracy);
+        System.out.println();
+    }
+
 
     private static void enterTestDataFromConsole(Scanner scanner) {
         System.out.println("\nYou selected to enter test data from console");
@@ -129,5 +107,9 @@ public class Main {
 
     public static void main(String[] args) {
         ui();
+    }
+
+    public static String getClassFromMap(Map<String, Integer> targetMap, int value) {
+        return targetMap.entrySet().stream().filter(entry -> entry.getValue() == value).findFirst().get().getKey();
     }
 }
